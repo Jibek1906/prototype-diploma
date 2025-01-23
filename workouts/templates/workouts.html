@@ -1,0 +1,13 @@
+{% extends 'base.html' %} {% block content %}
+<h2>Workout List</h2>
+{% for workout in workouts %}
+<div>
+  <h3>{{ workout.title }}</h3>
+  <p>{{ workout.description }}</p>
+  <iframe
+    src="https://www.youtube.com/embed/{{ workout.video_id }}"
+    frameborder="0"
+    allowfullscreen
+  ></iframe>
+</div>
+{% endfor %} {% endblock %}

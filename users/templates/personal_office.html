@@ -1,0 +1,186 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VibeFit - Personal Office</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static 'css/personal_office.css' %}" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo">VIBE<span>FIT</span></div>
+      <nav>
+        <ul>
+          <li>
+            <a href="#"><h2>Home</h2></a>
+          </li>
+          <li>
+            <a href="#"><h2>About</h2></a>
+          </li>
+          <li>
+            <a href="#"><h2>Contact Us</h2></a>
+          </li>
+          <li>
+            <a href="http://127.0.0.1:5000/workouts"><h2>Workouts</h2></a>
+          </li>
+          <li>
+            <a href="http://127.0.0.1:8000/nutrition"><h2>Nutrition</h2></a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="container">
+      <div class="card">
+        <img
+          src="{% if user_details.avatar %}{{ user_details.avatar.url }}{% else %}{% static 'img/avatar.png' %}{% endif %}"
+          alt="User Profile"
+          class="profile-img"
+        />
+        <div class="details">
+          <h2 class="user">
+            <strong> {{ user_details.user.username }} </strong>
+          </h2>
+          <p><strong>Height:</strong> {{ user_details.height }} cm</p>
+          <p><strong>Weight:</strong> {{ user_details.weight }} kg</p>
+          <p><strong>Goal:</strong> {{ user_details.get_goal_display }}</p>
+          <p>
+            <strong>Training Level:</strong>
+            {{ user_details.get_training_level_display }}
+          </p>
+
+          <!-- Edit Button (opens modal) -->
+          <button class="edit-btn" id="editBtn">Edit</button>
+        </div>
+      </div>
+
+      {% comment %}
+      <!-- Modal for editing details -->
+      <div id="editModal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn" id="closeBtn">&times;</span>
+          <h2>Edit Your Details</h2>
+          <form
+            method="POST"
+            action="{% url 'update_user_info' %}"
+            enctype="multipart/form-data"
+          >
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label for="id_height">Height (cm):</label>
+              {{ user_details_form.height }}
+            </div>
+
+            <div class="form-group">
+              <label for="id_weight">Weight (kg):</label>
+              {{ user_details_form.weight }}
+            </div>
+
+            <div class="form-group">
+              <label for="id_goal">Goal:</label>
+              {{ user_details_form.goal }}
+            </div>
+
+            <div class="form-group">
+              <label for="id_training_level">Training Level:</label>
+              {{ user_details_form.training_level }}
+            </div>
+
+            <div class="form-group">
+              <label for="id_avatar">Avatar:</label>
+              {{ user_profile_form.avatar }}
+            </div>
+
+            <button type="submit" class="save-btn">Save Changes</button>
+          </form>
+        </div>
+      </div>
+      {% endcomment %}
+
+      <div class="chart-container">
+        <h2 style="text-align: center">Weight Tracking Chart</h2>
+        <canvas id="weightChart"></canvas>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2024 VibeFit. All rights reserved.</p>
+    </footer>
+
+    <script>
+      // Script to toggle the modal
+      const editBtn = document.getElementById("editBtn");
+      const modal = document.getElementById("editModal");
+      const closeBtn = document.getElementById("closeBtn");
+
+      editBtn.onclick = function() {
+          modal.style.display = "block";
+      }
+
+      closeBtn.onclick = function() {
+          modal.style.display = "none";
+      }
+
+      // Close modal if clicked outside
+      window.onclick = function(event) {
+          if (event.target == modal) {
+              modal.style.display = "none";
+          }
+      }
+
+      // Chart setup for weight tracking
+      const ctx = document.getElementById('weightChart').getContext('2d');
+      const weightChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: {{ labels|safe }},
+              datasets: [{
+                  label: 'Weight (kg)',
+                  data: {{ weights|safe }},
+                  borderColor: '#9b957e',
+                  backgroundColor: 'rgba(155, 149, 126, 0.2)',
+                  borderWidth: 2,
+                  fill: true,
+                  pointRadius: 5,
+                  pointBackgroundColor: '#9b957e'
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      display: true,
+                      position: 'top',
+                      labels: {
+                          color: '#333'
+                      }
+                  }
+              },
+              scales: {
+                  x: {
+                      grid: {
+                          display: false
+                      },
+                      ticks: {
+                          color: '#333'
+                      }
+                  },
+                  y: {
+                      beginAtZero: false,
+                      grid: {
+                          color: '#ddd'
+                      },
+                      ticks: {
+                          color: '#333'
+                      }
+                  }
+              }
+          }
+      });
+    </script>
+  </body>
+</html>
