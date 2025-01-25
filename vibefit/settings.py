@@ -4,11 +4,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'your-secret-key'
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 LOGIN_REDIRECT_URL = '/users/profile/'
 
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+# CSRF и сессии
+CSRF_COOKIE_SECURE = False  # Изменить на True, если используешь HTTPS
+CSRF_COOKIE_HTTPONLY = True
+CSRF_USE_SESSIONS = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
