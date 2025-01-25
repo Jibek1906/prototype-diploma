@@ -14,6 +14,14 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Создаем объект UserDetails
+            UserDetails.objects.create(
+                user=user,
+                height=170,
+                weight=70,
+                goal='maintain',
+                training_level='beginner'
+            )
             return redirect('user_details', user_id=user.id)
     else:
         form = UserCreationForm()
@@ -25,10 +33,12 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            # Перенаправляем на личный кабинет
             return redirect('personal_office', user_id=user.id)
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
+
 
 def user_details(request, user_id):
     user = get_object_or_404(User, id=user_id)
