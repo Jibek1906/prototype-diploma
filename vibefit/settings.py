@@ -12,8 +12,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# CSRF и сессии
-CSRF_COOKIE_SECURE = False  # Изменить на True, если используешь HTTPS
+CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = True
 CSRF_USE_SESSIONS = True
 
@@ -92,9 +91,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# Убедитесь, что Django может найти ваши файлы статики в проекте
 STATICFILES_DIRS = [
-    BASE_DIR / "vibefit/static",  # Путь к вашей директории статики
+    BASE_DIR / "vibefit/static",
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
