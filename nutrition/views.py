@@ -1,4 +1,3 @@
-# nutrition/views.py
 from .ai_module import suggest_activity
 from workouts.models import Workout
 from .models import FoodItem
@@ -12,13 +11,11 @@ def log_food(request):
         log = UserFoodLog(user=user, food_item=food_item, quantity=quantity)
         log.save()
 
-        # Получение данных за неделю
         today = date.today()
         last_week = today - timedelta(days=7)
         food_logs = UserFoodLog.objects.filter(user=user, date__gte=last_week)
         workout_logs = WorkoutLog.objects.filter(user=user, date__gte=last_week)
 
-        # Рекомендации AI
         analytics = suggest_activity(user, food_logs, workout_logs)
 
         return render(request, 'nutrition.html', {

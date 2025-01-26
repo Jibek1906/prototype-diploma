@@ -1,4 +1,3 @@
-# nutrition/ai_module.py
 from datetime import timedelta, date
 
 def calculate_macros(food_logs):
@@ -18,16 +17,13 @@ def suggest_activity(user, food_logs, workout_logs):
     macros = calculate_macros(food_logs)
     total_calories = macros["calories"]
 
-    # Анализ недельной активности
     weekly_calories = sum([log.total_calories() for log in food_logs])
     weekly_workouts = sum([log.duration for log in workout_logs])
 
-    # Лимиты калорий
     daily_limit = 2000 if user.goal == 'lose-weight' else 2500
 
     recommendations = []
 
-    # Калории и активность
     if total_calories > daily_limit:
         recommendations.append(
             f"You consumed {total_calories - daily_limit} extra calories today. Add 30 minutes of cardio."
@@ -37,16 +33,13 @@ def suggest_activity(user, food_logs, workout_logs):
             f"You are under-eating by {daily_limit - total_calories} calories. Increase your intake."
         )
 
-    # Соотношение БЖУ
     protein_percentage = (macros["protein"] * 4) / total_calories * 100
     if protein_percentage < 20:
         recommendations.append("Increase your protein intake for better muscle recovery.")
 
-    # Перетренированность
     if weekly_workouts > 10 * 60:
         recommendations.append("You are overtraining. Take a rest day or reduce workout intensity.")
 
-    # Итог
     if not recommendations:
         recommendations.append("Great job! Keep maintaining your current routine.")
 
