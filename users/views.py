@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from .forms import UserDetailsForm
 from django.contrib.auth.models import User
@@ -76,3 +77,33 @@ def personal_office(request, user_id):
     }
 
     return render(request, 'personal_office.html', context)
+
+@login_required
+def update_user_details(request, user_id):
+    user_details = get_object_or_404(UserDetails, user__id=user_id)
+    if request.method == 'POST':
+        new_weight = request.POST.get('weight')
+        new_height = request.POST.get('height')
+        new_goal = request.POST.get('goal')
+        new_training_level = request.POST.get('training_level')
+        new_avatar = request.FILES.get('avatar')
+
+        user_details.height = new_height
+        user_details.weight = new_weight
+        user_details.goal = new_goal
+        user_details.training_level = new_training_level
+
+        if new_avatar:
+            user_details.avatar = new_avatar
+
+        user_details.save()
+
+        WeightRecord.objects.create(
+            user=user_details,
+            weight=new_weight,
+            date=timezone.now().date()
+        )
+
+        return redirect('personal_office', user_id=user_details.user.id)
+
+    return render(request, 'users/personal_office.html', {'user_details': user_details})

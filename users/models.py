@@ -32,18 +32,18 @@ class WeightRecord(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    height = models.PositiveIntegerField()
-    weight = models.PositiveIntegerField()
+    height = models.PositiveIntegerField(default=150)
+    weight = models.PositiveIntegerField(default=50)
     goal = models.CharField(max_length=50, choices=[
         ('Lose Weight', 'Lose Weight'),
         ('Gain Muscle', 'Gain Muscle'),
         ('Maintain', 'Maintain')
-    ])
+    ], default='Maintain')
     training_level = models.CharField(max_length=50, choices=[
         ('Beginner', 'Beginner'),
         ('Intermediate', 'Intermediate'),
         ('Advanced', 'Advanced')
-    ])
+    ], default='Beginner')
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
 
     def __str__(self):

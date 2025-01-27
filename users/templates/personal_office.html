@@ -1,13 +1,67 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VibeFit - Personal Office</title>
+    <title>Личный кабинет</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{% static 'css/personal_office.css' %}" />
+    <style>
+      .modal {
+        display: none; /* Изначально скрыто */
+        position: fixed;
+        z-index: 1; /* Ставим поверх других элементов */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4); /* Черный полупрозрачный фон */
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Ширина окна */
+        max-width: 500px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        animation: fadeIn 0.3s ease;
+        position: relative;
+      }
+
+      /* Крестик в правом верхнем углу */
+      .close-btn {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        cursor: pointer;
+      }
+
+      .close-btn:hover,
+      .close-btn:focus {
+        color: black;
+        text-decoration: none;
+      }
+
+      /* Анимация для модального окна */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
   </head>
   <body>
     <header class="header">
@@ -15,13 +69,13 @@
       <nav>
         <ul>
           <li>
-            <a href="#"><h2>Home</h2></a>
+            <a href="#"><h2>Main</h2></a>
           </li>
           <li>
-            <a href="#"><h2>About</h2></a>
+            <a href="#"><h2>About Us</h2></a>
           </li>
           <li>
-            <a href="#"><h2>Contact Us</h2></a>
+            <a href="#"><h2>Contacts</h2></a>
           </li>
           <li>
             <a href="http://127.0.0.1:5000/workouts"><h2>Workouts</h2></a>
@@ -48,62 +102,72 @@
           <p><strong>Weight:</strong> {{ user_details.weight }} kg</p>
           <p><strong>Goal:</strong> {{ user_details.get_goal_display }}</p>
           <p>
-            <strong>Training Level:</strong>
+            <strong>Training level:</strong>
             {{ user_details.get_training_level_display }}
           </p>
 
-          <!-- Edit Button (opens modal) -->
           <button class="edit-btn" id="editBtn">Edit</button>
         </div>
       </div>
 
-      {% comment %}
-      <!-- Modal for editing details -->
-      <div id="editModal" class="modal">
-        <div class="modal-content">
-          <span class="close-btn" id="closeBtn">&times;</span>
-          <h2>Edit Your Details</h2>
-          <form
-            method="POST"
-            action="{% url 'update_user_info' %}"
-            enctype="multipart/form-data"
-          >
-            {% csrf_token %}
-
-            <div class="form-group">
-              <label for="id_height">Height (cm):</label>
-              {{ user_details_form.height }}
-            </div>
-
-            <div class="form-group">
-              <label for="id_weight">Weight (kg):</label>
-              {{ user_details_form.weight }}
-            </div>
-
-            <div class="form-group">
-              <label for="id_goal">Goal:</label>
-              {{ user_details_form.goal }}
-            </div>
-
-            <div class="form-group">
-              <label for="id_training_level">Training Level:</label>
-              {{ user_details_form.training_level }}
-            </div>
-
-            <div class="form-group">
-              <label for="id_avatar">Avatar:</label>
-              {{ user_profile_form.avatar }}
-            </div>
-
-            <button type="submit" class="save-btn">Save Changes</button>
-          </form>
-        </div>
-      </div>
-      {% endcomment %}
-
       <div class="chart-container">
-        <h2 style="text-align: center">Weight Tracking Chart</h2>
+        <h2 style="text-align: center">Weight Graph</h2>
         <canvas id="weightChart"></canvas>
+      </div>
+    </div>
+
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeBtn">&times;</span>
+        <h2>Edit your details</h2>
+        <form
+          method="POST"
+          action="{% url 'update_user_info' user_details.user.id %}"
+          enctype="multipart/form-data"
+        >
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="id_height">Height (cm):</label>
+            <input
+              type="number"
+              name="height"
+              value="{{ user_details.height }}"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="id_weight">Weight (kg):</label>
+            <input
+              type="number"
+              name="weight"
+              value="{{ user_details.weight }}"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="id_goal">Goal:</label>
+            <input
+              type="text"
+              name="goal"
+              value="{{ user_details.goal }}"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="id_training_level">Training level:</label>
+            <input
+              type="text"
+              name="training_level"
+              value="{{ user_details.training_level }}"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="id_avatar">Avatar:</label>
+            <input type="file" name="avatar" />
+          </div>
+          <button type="submit" class="save-btn">Save changes</button>
+        </form>
       </div>
     </div>
 
@@ -112,27 +176,24 @@
     </footer>
 
     <script>
-      // Script to toggle the modal
-      const editBtn = document.getElementById("editBtn");
-      const modal = document.getElementById("editModal");
-      const closeBtn = document.getElementById("closeBtn");
+      const editBtn = document.getElementById('editBtn');
+      const modal = document.getElementById('editModal');
+      const closeBtn = document.getElementById('closeBtn');
 
       editBtn.onclick = function() {
-          modal.style.display = "block";
+          modal.style.display = 'flex';
       }
 
       closeBtn.onclick = function() {
-          modal.style.display = "none";
+          modal.style.display = 'none';
       }
 
-      // Close modal if clicked outside
       window.onclick = function(event) {
-          if (event.target == modal) {
-              modal.style.display = "none";
+          if (event.target === modal) {
+              modal.style.display = 'none';
           }
       }
 
-      // Chart setup for weight tracking
       const ctx = document.getElementById('weightChart').getContext('2d');
       const weightChart = new Chart(ctx, {
           type: 'line',
@@ -166,7 +227,7 @@
                           display: false
                       },
                       ticks: {
-                          color: '#333'
+                          display: false
                       }
                   },
                   y: {
