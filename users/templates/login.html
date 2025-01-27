@@ -5,7 +5,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Registration / Login{% endblock %}</title>
+    <title>Login Page</title>
     <link rel="stylesheet" href="{% static 'css/registration.css' %}" />
     <link
       href="https://fonts.googleapis.com/css2?family=Baloo&display=swap"
@@ -14,16 +14,15 @@
   </head>
   <body>
     <div class="page-container">
-      <div class="form-container">
-        <div class="form-image">
+      <div class="registration-container">
+        <div class="registration-image">
           <img
             src="{% static 'img/registration.jpg' %}"
-            alt="{% block img_alt %}Registration Image{% endblock %}"
+            alt="Registration Image"
           />
         </div>
-        <div class="form-content">
-          <h1>{% block heading %}Build Your Perfect Body{% endblock %}</h1>
-
+        <div class="form-container">
+          <h1>Login</h1>
           <form method="post">
             {% csrf_token %} {% for field in form %}
             <div class="form-field">
@@ -37,15 +36,11 @@
               {% endif %}
             </div>
             {% endfor %}
-
-            <button class="cta-button" type="submit">
-              {% block button_text %}Sign Up{% endblock %}
-            </button>
+            <button class="cta-button" type="submit">Log In</button>
           </form>
-
-          {% block form_link %}
-          <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
-          {% endblock %}
+          <p>
+            Don't have an account? <a href="{% url 'register' %}">Sign Up</a>
+          </p>
         </div>
       </div>
     </div>
