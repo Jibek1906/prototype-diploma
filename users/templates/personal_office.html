@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="ru">
   <head>
@@ -10,14 +9,14 @@
     <link rel="stylesheet" href="{% static 'css/personal_office.css' %}" />
     <style>
       .modal {
-        display: none; /* Изначально скрыто */
+        display: none;
         position: fixed;
-        z-index: 1; /* Ставим поверх других элементов */
+        z-index: 1;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.4); /* Черный полупрозрачный фон */
+        background-color: rgba(0, 0, 0, 0.4);
         justify-content: center;
         align-items: center;
       }
@@ -27,7 +26,7 @@
         margin: 15% auto;
         padding: 20px;
         border: 1px solid #888;
-        width: 80%; /* Ширина окна */
+        width: 80%;
         max-width: 500px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         border-radius: 10px;
@@ -35,7 +34,6 @@
         position: relative;
       }
 
-      /* Крестик в правом верхнем углу */
       .close-btn {
         color: #aaa;
         font-size: 28px;
@@ -52,7 +50,6 @@
         text-decoration: none;
       }
 
-      /* Анимация для модального окна */
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -60,6 +57,13 @@
         to {
           opacity: 1;
         }
+      }
+
+      .avatar-container img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
       }
     </style>
   </head>
@@ -89,23 +93,20 @@
 
     <div class="container">
       <div class="card">
-        <img
-          src="{% if user_details.avatar %}{{ user_details.avatar.url }}{% else %}{% static 'img/avatar.png' %}{% endif %}"
-          alt="User Profile"
-          class="profile-img"
-        />
+        <div class="avatar-container">
+          <img
+            src="{{ user_details.avatar.url|default:'{% static "images/placeholder.png" %}' }}"
+            alt="User Avatar"
+          />
+        </div>
         <div class="details">
           <h2 class="user">
-            <strong> {{ user_details.user.username }} </strong>
+            <strong>{{ user_details.user.username }}</strong>
           </h2>
           <p><strong>Height:</strong> {{ user_details.height }} cm</p>
           <p><strong>Weight:</strong> {{ user_details.weight }} kg</p>
           <p><strong>Goal:</strong> {{ user_details.get_goal_display }}</p>
-          <p>
-            <strong>Training level:</strong>
-            {{ user_details.get_training_level_display }}
-          </p>
-
+          <p><strong>Training level:</strong> {{ user_details.get_training_level_display }}</p>
           <button class="edit-btn" id="editBtn">Edit</button>
         </div>
       </div>
@@ -146,21 +147,31 @@
           </div>
           <div class="form-group">
             <label for="id_goal">Goal:</label>
-            <input
-              type="text"
-              name="goal"
-              value="{{ user_details.goal }}"
-              required
-            />
+            <select name="goal" id="id_goal" required>
+              <option value="lose-weight" {% if user_details.goal == "lose-weight" %}selected{% endif %}>
+                Lose Weight
+              </option>
+              <option value="maintain" {% if user_details.goal == "maintain" %}selected{% endif %}>
+                Maintain Weight
+              </option>
+              <option value="gain-muscle" {% if user_details.goal == "gain-muscle" %}selected{% endif %}>
+                Gain Muscle
+              </option>
+            </select>
           </div>
           <div class="form-group">
             <label for="id_training_level">Training level:</label>
-            <input
-              type="text"
-              name="training_level"
-              value="{{ user_details.training_level }}"
-              required
-            />
+            <select name="training_level" id="id_training_level" required>
+              <option value="beginner" {% if user_details.training_level == "beginner" %}selected{% endif %}>
+                Beginner
+              </option>
+              <option value="intermediate" {% if user_details.training_level == "intermediate" %}selected{% endif %}>
+                Intermediate
+              </option>
+              <option value="advanced" {% if user_details.training_level == "advanced" %}selected{% endif %}>
+                Advanced
+              </option>
+            </select>
           </div>
           <div class="form-group">
             <label for="id_avatar">Avatar:</label>
@@ -180,67 +191,61 @@
       const modal = document.getElementById('editModal');
       const closeBtn = document.getElementById('closeBtn');
 
-      editBtn.onclick = function() {
-          modal.style.display = 'flex';
-      }
+      editBtn.onclick = function () {
+        modal.style.display = 'flex';
+      };
 
-      closeBtn.onclick = function() {
+      closeBtn.onclick = function () {
+        modal.style.display = 'none';
+      };
+
+      window.onclick = function (event) {
+        if (event.target === modal) {
           modal.style.display = 'none';
-      }
-
-      window.onclick = function(event) {
-          if (event.target === modal) {
-              modal.style.display = 'none';
-          }
-      }
+        }
+      };
 
       const ctx = document.getElementById('weightChart').getContext('2d');
       const weightChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-              labels: {{ labels|safe }},
-              datasets: [{
-                  label: 'Weight (kg)',
-                  data: {{ weights|safe }},
-                  borderColor: '#9b957e',
-                  backgroundColor: 'rgba(155, 149, 126, 0.2)',
-                  borderWidth: 2,
-                  fill: true,
-                  pointRadius: 5,
-                  pointBackgroundColor: '#9b957e'
-              }]
-          },
-          options: {
-              responsive: true,
-              plugins: {
-                  legend: {
-                      display: true,
-                      position: 'top',
-                      labels: {
-                          color: '#333'
-                      }
-                  }
+        type: 'line',
+        data: {
+          labels: {{ labels|safe }},
+          datasets: [
+            {
+              label: 'Weight (kg)',
+              data: {{ weights|safe }},
+              borderColor: '#9b957e',
+              backgroundColor: 'rgba(155, 149, 126, 0.2)',
+              borderWidth: 2,
+              fill: true,
+              pointRadius: 5,
+              pointBackgroundColor: '#9b957e',
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                color: '#333',
               },
-              scales: {
-                  x: {
-                      grid: {
-                          display: false
-                      },
-                      ticks: {
-                          display: false
-                      }
-                  },
-                  y: {
-                      beginAtZero: false,
-                      grid: {
-                          color: '#ddd'
-                      },
-                      ticks: {
-                          color: '#333'
-                      }
-                  }
-              }
-          }
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { display: false },
+            },
+            y: {
+              beginAtZero: false,
+              grid: { color: '#ddd' },
+              ticks: { color: '#333' },
+            },
+          },
+        },
       });
     </script>
   </body>

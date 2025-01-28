@@ -8,7 +8,7 @@ class UserDetails(models.Model):
     goal_choices = [
         ('lose-weight', 'Lose Weight'),
         ('gain-muscle', 'Gain Muscle'),
-        ('maintain', 'Maintain Fitness'),
+        ('maintain', 'Maintain Weight'),
     ]
     goal = models.CharField(max_length=50, choices=goal_choices)
     training_level_choices = [
@@ -17,6 +17,7 @@ class UserDetails(models.Model):
         ('advanced', 'Advanced'),
     ]
     training_level = models.CharField(max_length=50, choices=training_level_choices)
+    avatar = models.ImageField(upload_to='avatars/', default='avatars/default_avatar.png', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
@@ -37,7 +38,7 @@ class UserProfile(models.Model):
     goal = models.CharField(max_length=50, choices=[
         ('Lose Weight', 'Lose Weight'),
         ('Gain Muscle', 'Gain Muscle'),
-        ('Maintain', 'Maintain')
+        ('Maintain', 'Maintain Weight')
     ], default='Maintain')
     training_level = models.CharField(max_length=50, choices=[
         ('Beginner', 'Beginner'),

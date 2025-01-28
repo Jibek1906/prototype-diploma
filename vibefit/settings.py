@@ -16,6 +16,7 @@ CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = True
 CSRF_USE_SESSIONS = True
 
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,6 +41,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'vibefit.urls'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.backends.EmailAuthBackend',
+]
 
 TEMPLATES = [
     {
@@ -90,6 +96,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 STATICFILES_DIRS = [
     BASE_DIR / "vibefit/static",

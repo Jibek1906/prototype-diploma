@@ -5,17 +5,18 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from .forms import UserDetailsForm
 from django.contrib.auth.models import User
+from .forms import LoginForm
 from .models import UserDetails, WeightRecord
+from .forms import CustomUserCreationForm
 
 def main(request):
     return render(request, 'main.html')
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Создаем объект UserDetails
             UserDetails.objects.create(
                 user=user,
                 height=170,
@@ -23,21 +24,26 @@ def register(request):
                 goal='maintain',
                 training_level='beginner'
             )
-            return redirect('user_details', user_id=user.id)
+            return redirect('user_details', user_id=user.id)  # Перенаправляем на страницу user_details
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'registration.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = LoginForm(request.POST)
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            # Перенаправляем на личный кабинет
-            return redirect('personal_office', user_id=user.id)
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=email, password=password)  # Используем email как username
+            if user is not None:
+                login(request, user)
+                return redirect('personal_office', user_id=user.id)
+            else:
+                form.add_error(None, "Invalid email or password.")
     else:
-        form = AuthenticationForm()
+        form = LoginForm()
+
     return render(request, 'login.html', {'form': form})
 
 
